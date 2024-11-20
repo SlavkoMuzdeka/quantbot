@@ -17,8 +17,6 @@ We do this, because loading info from Yahoo Finance is time consuming
 # save_file(HISTORICAL_DF_PATH, (df, instruments))
 
 df, instruments = load_file(HISTORICAL_DF_PATH)
-# st.write(df)
-# st.write(instruments)
 
 sim_start = df.index[-1] - relativedelta(year=3)
 lbmom = Lbmom(
@@ -27,3 +25,7 @@ lbmom = Lbmom(
     simulation_start=sim_start,
     vol_target=VOL_TARGET,
 )
+
+df = lbmom.run_simulation(df)
+# df.to_csv("see.csv", index=False)
+print(df)

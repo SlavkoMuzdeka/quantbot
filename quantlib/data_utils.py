@@ -50,7 +50,7 @@ def extend_dataframe(instruments, df):
             historical_data[f"{inst} close"] / historical_data[f"{inst} close"].shift(1)
             - 1
         )
-        historical_data[f"{inst} % rev vol"] = (
+        historical_data[f"{inst} % ret vol"] = (
             historical_data[f"{inst} % ret"].rolling(25).std()
         )
         historical_data[f"{inst} active"] = historical_data[
