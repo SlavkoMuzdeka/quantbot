@@ -1,12 +1,23 @@
+import json
 import streamlit as st  # We use streamlit for better visusalisation
 
+from brokerage.oanda.oanda import Oanda
 from subsystems.lbmom.Lbmom import Lbmom
+from dateutil.relativedelta import relativedelta
 from quantlib.general_utils import save_file, load_file
 from quantlib.data_utils import get_sp500_df, extend_dataframe
-from dateutil.relativedelta import relativedelta
 
 VOL_TARGET = 0.2  # We are targetting 20% annualized vol
+AUTH_CONFIG_PATH = "config/auth_config.json"
 HISTORICAL_DF_PATH = "Data/historical_df.obj"
+
+
+with open(AUTH_CONFIG_PATH, "rb") as f:
+    auth_config = json.load(f)
+
+oanda = Oanda(auth_config=auth_config)
+exit()
+
 
 """
 Run this only first time, if there is no locally data that we will use. 

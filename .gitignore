@@ -1,2 +1,4 @@
 env
 pom.py
+__pycache__
+config/auth_config.json
