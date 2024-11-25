@@ -8,7 +8,7 @@ def get_sp500_df():
     ohlcvs = {}
 
     for inst in instruments:
-        inst_df = yf.Ticker(inst).history(period="5y")
+        inst_df = yf.Ticker(inst).history(period="10y")
         ohlcvs[inst] = inst_df[["Open", "High", "Low", "Close", "Volume"]].rename(
             columns={
                 "Open": "open",
@@ -66,9 +66,7 @@ def _get_sp500_instruments():
     table = pd.read_html(url)
     sp500_table = table[0]
     symbols = sp500_table["Symbol"].tolist()
-    return symbols[
-        :10
-    ]  # TODO Change if neccessary - for this case we only get 10 first sybmols from S&P 500 list
+    return symbols[:10]
 
 
 def _format_date(dates):

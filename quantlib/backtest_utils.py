@@ -46,3 +46,19 @@ def get_strat_scalar(portfolio_df, lookback, vol_target, idx, default):
         return strat_scalar
     else:
         return default
+
+
+def kpis(df):
+    portfolio_df = df.copy()
+    portfolio_df["cum ret"] = (1 + portfolio_df["capital ret"]).cumprod()
+    portfolio_df["drawdown"] = (
+        portfolio_df["cum ret"] / portfolio_df["cum ret"].cummax() - 1
+    )
+    sharpe = (
+        portfolio_df["capital ret"].mean()
+        / portfolio_df["capital ret"].std()
+        * np.sqrt(253)
+    )
+    drawdown_max = portfolio_df["drawdown"].min() * 100
+    volatility = portfolio_df["capital ret"].std() * np.sqrt(253) * 100
+    return portfolio_df, sharpe, drawdown_max, volatility

@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 
 from quantlib.indicators_cal import adx_series, ema_series
+from quantlib.diagnostics_utils import save_backtests, save_diagnostics
 from quantlib.backtest_utils import get_backtest_day_strats, get_strat_scalar
 
 
@@ -139,7 +140,7 @@ class Lbmom:
 
             for inst in instruments:
                 units = portfolio_df.loc[i, f"{inst} units"]
-                nominal_inst = abs(units * historical_df.loc[date, f"{inst} close"])
+                nominal_inst = units * historical_df.loc[date, f"{inst} close"]
                 inst_w = nominal_inst / nominal_total if nominal_total != 0 else None
                 portfolio_df.loc[i, f"{inst} w"] = inst_w
 
@@ -150,6 +151,19 @@ class Lbmom:
             portfolio_df.loc[i, "leverage"] = (
                 portfolio_df.loc[i, "nominal"] / portfolio_df.loc[i, "capital"]
             )
+
+        portfolio_df.set_index("date", inplace=True)
+        save_backtests(
+            portfolio_df=portfolio_df,
+            brokerage_used="oan",
+            sysname=self.sysname,
+        )
+        save_diagnostics(
+            portfolio_df=portfolio_df,
+            instruments=instruments,
+            brokerage_used="oan",
+            sysname=self.sysname,
+        )
 
         return portfolio_df, instruments
 

@@ -105,10 +105,6 @@ def main():
         df, instruments = strat.get_subsys_pos()
         print(df, instruments)
 
-    # portfolio_df = lbmom.run_simulation(df)
-    # print((1 + portfolio_df["capital ret"]).cumprod().iloc[-1])
-    # print(portfolio_df)
-
 
 if __name__ == "__main__":
     main()
