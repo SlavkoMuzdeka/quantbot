@@ -1,0 +1,12 @@
+{
+  "sim_years": 3,
+  "vol_target": 0.25,
+  "instruments_config": {
+    "lbmom": "./subsystems/lbmom/instruments.json",
+    "lsmom": "./subsystems/lsmom/instruments.json"
+  },
+  "subsystems": {
+    "lbmom": 0.5,
+    "lsmom": 0.5
+  }
+}

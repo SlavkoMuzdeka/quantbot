@@ -1,3 +1,4 @@
+import json
 import pickle
 
 
@@ -16,3 +17,21 @@ def load_file(path):
         return file
     except Exception as ex:
         print(f"An error occurs while loading file - {ex}")
+
+
+def load_config(config_path):
+    try:
+        with open(config_path, "rb") as f:
+            return json.load(f)
+    except Exception as ex:
+        print(f"Error while loading config - {ex}")
+        raise
+
+
+def save_config(config, config_path):
+    try:
+        with open(config_path, "wb") as f:
+            json.dump(config, f, indent=4)
+    except Exception as ex:
+        print(f"Error while saving config - {ex}")
+        raise

@@ -6,7 +6,7 @@ from quantlib.indicators_cal import adx_series, ema_series
 from quantlib.backtest_utils import get_backtest_day_strats, get_strat_scalar
 
 
-class Lbmom:
+class Lsmom:
     def __init__(self, instruments_config, historical_df, simulation_start, vol_target):
         self.pairs = [
             (188, 292),
@@ -26,10 +26,10 @@ class Lbmom:
         self.vol_target = vol_target
         with open(instruments_config) as f:
             self.instruments_config = json.load(f)
-        self.sysname = "LBMOM"
+        self.sysname = "LSMOM"
 
     def extend_historicals(self, instruments, historical_df):
-        new_columns = {}  # Dictionary to collect new columns
+        new_columns = {}
         for inst in instruments:
             historical_df[f"{inst} adx"] = adx_series(
                 high=historical_df[f"{inst} high"],
@@ -108,6 +108,12 @@ class Lbmom:
                         1
                         for pair in self.pairs
                         if historical_df.loc[date, f"{inst} ema{str(pair)}"] > 0
+                    ]
+                ) + np.sum(
+                    [
+                        -1
+                        for pair in self.pairs
+                        if historical_df.loc[date, f"{inst} ema{str(pair)}"] < 0
                     ]
                 )
                 forecast = votes / len(self.pairs)
