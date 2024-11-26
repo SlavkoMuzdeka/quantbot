@@ -55,7 +55,9 @@ class TradeClient:
 
     def get_account_summary(self):
         try:
-            return self.client.request(accounts.AccountSummary(accountID=self.id))
+            return self.client.request(accounts.AccountSummary(accountID=self.id))[
+                "account"
+            ]
         except Exception as ex:
             print(f"An error occurs while getting account summary - {ex}")
             raise
@@ -108,7 +110,7 @@ class TradeClient:
     def get_ohlcv(self, instrument, count, granularity):
         params = {"count": count, "granularity": granularity}
         candles = self.client.request(
-            instruments.InstrumentsCandles(instrument=instruments, params=params)
+            instruments.InstrumentsCandles(instrument=instrument, params=params)
         )
         ohlc_dict = candles.response["candles"]
         ohlc_df = pd.DataFrame(ohlc_dict)

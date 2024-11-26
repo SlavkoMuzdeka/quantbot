@@ -48,6 +48,23 @@ def get_strat_scalar(portfolio_df, lookback, vol_target, idx, default):
         return default
 
 
+def set_leverage_cap(
+    portfolio_df, instruments, date, idx, nominal_tot, leverage_cap, historical_data
+):
+    leverage = nominal_tot / portfolio_df.loc[idx, "capital"]
+    if leverage > leverage_cap:
+        new_nominals = 0
+        leverage_scalar = leverage_cap / leverage
+        for inst in instruments:
+            newpos = portfolio_df.loc[idx, f"{inst} units"] * leverage_scalar
+            portfolio_df.loc[idx, f"{inst} units"] = newpos
+            if newpos != 0:
+                new_nominals += abs(newpos * historical_data.loc[date, f"{inst} close"])
+        return new_nominals
+    else:
+        return nominal_tot
+
+
 def kpis(df):
     portfolio_df = df.copy()
     portfolio_df["cum ret"] = (1 + portfolio_df["capital ret"]).cumprod()
