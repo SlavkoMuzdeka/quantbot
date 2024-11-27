@@ -194,6 +194,13 @@ def main():
     )
 
     """
+    Get Existing Positions & Capital
+    """
+    brokerage = Oanda(auth_config=load_config("AUTH"))
+    positions = brokerage.get_trade_client().get_account_positions()
+    capital = brokerage.get_trade_client().get_account_capital()
+
+    """
     Subsystem positioning
     """
     subsystems_config = portfolio_config["subsystems"]
@@ -233,6 +240,66 @@ def main():
         subsystems_weights=subsystems_config,
     )
     print(portfolio_df)
+
+    """
+    Live Optimal Portfolio Allocations
+    """
+    trade_on_date = portfolio_df.index[-1]
+    capital_scalar = capital_scalar / portfolio_df.loc[trade_on_date, "capital"]
+    portfolio_optimal = {}
+
+    for inst in traded:
+        unscaled_optimal = portfolio_df.loc[trade_on_date, f"{inst} units"]
+        scaled_units = unscaled_optimal * capital_scalar
+        portfolio_optimal[inst] = {
+            "unscaled": unscaled_optimal,
+            "scaled_units": scaled_units,
+            "rounded_units": round(scaled_units),
+            "nominal_exposure": (
+                abs(scaled_units * df.loc[trade_on_date, f"{inst} close"])
+                if scaled_units != 0
+                else 0
+            ),
+        }
+
+    instruments_held = positions.keys()
+    instruments_unheld = [inst for inst in traded if inst not in instruments_held]
+
+    for inst_held in instruments_held:
+        order_config = brokerage.get_service_client().get_order_spec(
+            inst=inst,
+            scaled_units=portfolio_optimal[inst_held]["scaled_units"],
+            current_contracts=float(positions[inst_held]),
+        )
+
+        required_change = round(
+            order_config["rounded_contracts"] - order_config["current_contracts"], 2
+        )
+        percent_change = round(
+            abs(required_change / order_config["current_contracts"]), 3
+        )
+        is_inertia_overriden = brokerage.get_service_client().is_intertia_overriden(
+            percentage_change=percent_change
+        )
+
+        if is_inertia_overriden:
+            if portfolio_config["order_enabled"]:
+                brokerage.get_trade_client().market_order(
+                    inst=inst, order_config=order_config
+                )
+
+    for inst_unheld in instruments_unheld:
+        order_config = brokerage.get_service_client().get_order_spec(
+            inst=inst_unheld,
+            scaled_units=portfolio_optimal[inst_unheld]["scaled_units"],
+            current_contracts=0,
+        )
+
+        if order_config["rounded_contracts"] != 0:
+            if portfolio_config["order_enabled"]:
+                brokerage.get_trade_client().market_order(
+                    inst=inst_unheld, order_config=order_config
+                )
 
 
 if __name__ == "__main__":

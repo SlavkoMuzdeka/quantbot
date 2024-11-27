@@ -1,4 +1,5 @@
 {
+  "order_enabled": true,
   "sim_years": 3,
   "vol_target": 0.25,
   "instruments_config": {
